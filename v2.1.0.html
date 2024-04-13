@@ -1,0 +1,349 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机抽取学号</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f2f2f2;
+            margin: 0;
+            padding: 0;
+        }
+        .header {
+            position: absolute;
+            top: 14px;
+            left: 10px;
+            font-size: 28px;
+            font-weight: bold;
+            color: #808080;
+        }
+        .version {
+            font-style: italic;
+            color: #ADD8E6;
+        }
+        .main-container {
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc;
+            border-radius: 8px;
+            margin: 20px auto;
+            max-width: 600px;
+            position: relative;
+        }
+        h2 {
+            color: black;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            margin-top: 0;
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #ccc;
+            border-radius: 8px;
+            padding: 20px;
+            margin: 20px auto;
+            max-width: 550px;
+        }
+        .dialog-box {
+            background-color: lightgray;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            width: 570px;
+            height: 325px;
+        }
+        .selection-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .selection-button {
+            background-color: white;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 40px;
+            height: 40px;
+            margin: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+        .selection-button:hover {
+            transform: scale(1.1);
+        }
+        .selection-button.selected {
+            background-color: #3498db;
+        }
+        .select-button,
+        .clear-button {
+            background-color: red;
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.3s ease, background-color 0.3s ease;
+        }
+        .select-button:hover,
+        .clear-button:hover {
+            background-color: black;
+            transform: scale(1.1);
+        }
+        .disabled {
+            background-color: gray;
+            color: white;
+            cursor: not-allowed;
+            text-decoration: line-through;
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .input-box {
+            width: 40px;
+            text-align: center;
+        }
+        .control-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 16px;
+        }
+        .control-button:disabled {
+            background-color: lightgray;
+            cursor: not-allowed;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        .button-container {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .slider-container {
+            position: absolute;
+            bottom: 20px;
+            right: 20px;
+            width: 275px;
+            display: flex;
+            flex-direction: column;
+            align-items: flex-end;
+            z-index: 1;
+        }
+        .slider {
+            width: 100%;
+            margin-top: 10px;
+        }
+        .modal {
+            display: none;
+            position: fixed;
+            z-index: 2;
+            left: 0;
+            top: 0;
+            width: 100%;
+            height: 100%;
+            overflow: auto;
+            background-color: rgba(0,0,0,0.4);
+        }
+        .modal-content {
+            background-color: #fefefe;
+            margin: 15% auto;
+            padding: 20px;
+            border: 1px solid #888;
+            width: 40%;
+            border-radius: 10px;
+        }
+        .close {
+            color: #aaaaaa;
+            float: right;
+            font-size: 28px;
+            font-weight: bold;
+        }
+        .close:hover,
+        .close:focus {
+            color: #000;
+            text-decoration: none;
+            cursor: pointer;
+        }
+        .copyright {
+            font-size: 12px;
+            color: gray;
+            position: absolute;
+            bottom: 20px;
+            left: 20px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <div class="header">
+        <span style="color: #808080;">Draw Lots</span> <span class="version">Beta v2.1.0</span>
+    </div>
+    <div class="main-container">
+        <h2>请输入要选取的学号个数</h2>
+        <div class="container">
+            <div class="controls">
+                <button class="control-button" onclick="decreaseNumber()" id="decreaseButton" disabled>-</button>
+                <div class="input-container">
+                    <input class="input-box" type="number" id="numberInput" value="1" min="1">
+                </div>
+                <button class="control-button" onclick="increaseNumber()">+</button>
+            </div>
+        </div>
+        <h2>请点击参与抽签的学号</h2>
+        <div class="dialog-box">
+            <div class="container" id="container"></div>
+        </div>
+        <div class="button-container">
+            <button class="select-button" onclick="selectNumbers()" style="background-color: green;">抽取学号</button>
+            <button class="select-button" onclick="selectAll()" style="background-color: blue;">全选选择</button>
+            <button class="clear-button" onclick="clearSelection()" style="background-color: red;">全部取消</button>
+        </div>
+    </div>
+    <div class="slider-container">
+        <input type="range" min="2" max="50" value="48" class="slider" id="myRange">
+        <p>已显示的按钮数量: <span id="sliderValue"></span></p>
+    </div>
+    <div id="myModal" class="modal">
+        <div class="modal-content">
+            <span class="close">&times;</span>
+            <h2>被选中的学号：</h2>
+            <p id="modalResult"></p>
+        </div>
+    </div>
+    <!-- 版权信息 -->
+    <div class="copyright">
+        Author: 初二六班电教员 邱艺鹏<br>
+        Version: Beta v2.1.0<br>
+        Contact: XNWYRobotics2023<br>
+        Copyright (C) 2024 邱艺鹏
+    </div>
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+        var modal = document.getElementById("myModal");
+        var span = document.getElementsByClassName("close")[0];
+
+        span.onclick = function() {
+            modal.style.display = "none";
+        }
+
+        window.onclick = function(event) {
+            if (event.target == modal) {
+                modal.style.display = "none";
+            }
+        }
+
+        function toggleSelection(button) {
+            if (!button.classList.contains('disabled')) {
+                button.classList.toggle('selected');
+            }
+        }
+
+        function clearSelection() {
+            const buttons = document.querySelectorAll('.selection-button');
+            buttons.forEach(button => {
+                if (!button.classList.contains('disabled')) {
+                    button.classList.remove('selected');
+                }
+            });
+            document.getElementById('modalResult').textContent = '';
+        }
+
+        function increaseNumber() {
+            const inputBox = document.getElementById('numberInput');
+            inputBox.value = parseInt(inputBox.value) + 1;
+            document.getElementById('decreaseButton').disabled = false;
+            if (inputBox.value <= 1) document.getElementById('decreaseButton').disabled = true;
+        }
+
+        function decreaseNumber() {
+            const inputBox = document.getElementById('numberInput');
+            inputBox.value = Math.max(1, parseInt(inputBox.value) - 1);
+            document.getElementById('decreaseButton').disabled = inputBox.value <= 1;
+        }
+
+        function selectNumbers() {
+            const numberInput = document.getElementById('numberInput');
+            const selectedButtons = document.querySelectorAll('.selection-button.selected');
+            const selectedNumbers = Array.from(selectedButtons).map(button => parseInt(button.textContent));
+
+            const numToSelect = parseInt(numberInput.value);
+            if (numToSelect > 0 && numToSelect <= selectedNumbers.length) {
+                const randomNumbers = [];
+                while (randomNumbers.length < numToSelect) {
+                    const randomIndex = Math.floor(Math.random() * selectedNumbers.length);
+                    const randomNumber = selectedNumbers.splice(randomIndex, 1)[0];
+                    randomNumbers.push(randomNumber);
+                }
+
+                randomNumbers.sort((a, b) => a - b);
+                document.getElementById('modalResult').textContent = randomNumbers.join(', ');
+                modal.style.display = "block";
+            }
+        }
+
+        function selectAll() {
+            const selectionButtons = document.querySelectorAll('.selection-button:not(.disabled)');
+            selectionButtons.forEach(button => button.classList.add('selected'));
+        }
+        // 滑动条功能
+        var slider = document.getElementById("myRange");
+        var output = document.getElementById("sliderValue");
+        output.innerHTML = slider.value;
+
+        slider.oninput = function() {
+            output.innerHTML = this.value;
+            generateButtons(this.value);
+        }
+        function generateButtons(numButtons) {
+            const container = document.getElementById('container');
+            container.innerHTML = '';
+            const rows = Math.ceil(numButtons / 10); // 计算需要的行数
+            let remainingButtons = numButtons;
+            for (let i = 0; i < rows; i++) {
+                const rowButtons = remainingButtons >= 10 ? 10 : remainingButtons;
+                const rowDiv = document.createElement('div');
+                rowDiv.classList.add('selection-box');
+                for (let j = 1; j <= rowButtons; j++) {
+                    const button = document.createElement('button');
+                    button.classList.add('selection-button');
+                    button.textContent = j + i * 10;
+                    button.onclick = function() {
+                        toggleSelection(this);
+                    };
+                    rowDiv.appendChild(button);
+                }
+                container.appendChild(rowDiv);
+                remainingButtons -= rowButtons;
+            }
+        }
+
+        window.onload = function() {
+            generateButtons(document.getElementById("myRange").value);
+        }
+
+        document.getElementById("myRange").oninput = function() {
+            document.getElementById("sliderValue").textContent = this.value;
+            generateButtons(this.value);
+        }
+    </script>
+</body>
+</html>

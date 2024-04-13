@@ -1,0 +1,354 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>随机抽取学号</title>
+    <style>
+
+        /* CSS 样式 */
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f2f2f2; /* 设置页面背景色为浅灰色 */
+        }
+        .main-container {
+            background-color: white;
+            padding: 20px;
+            border: 1px solid #ccc; /* 添加灰色边框 */
+            border-radius: 8px;
+            margin: 20px auto;
+            max-width: 600px; /* 限制页面宽度 */
+        }
+        h2 {
+            color: black;
+            font-size: 20px;
+            display: flex;
+            align-items: center;
+            margin-top: 0; /* 去掉标题的上边距 */
+        }
+        .container {
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            border: 2px solid #ccc; /* 添加外边框 */
+            border-radius: 8px; /* 圆角边框 */
+            padding: 20px; /* 添加内边距 */
+            margin: 20px auto;
+            max-width: 600px; /* 限制容器宽度 */
+        }
+        .dialog-box {
+            background-color: lightgray;
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+        }
+        .selection-box {
+            display: flex;
+            flex-wrap: wrap;
+            justify-content: center;
+        }
+        .selection-button {
+            background-color: white; /* 初始颜色为白色 */
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            margin: 5px;
+            cursor: pointer;
+            transition: transform 0.3s ease, background-color 0.3s ease; /* 添加过渡效果 */
+        }
+        .selection-button:hover {
+            transform: scale(1.1); /* 鼠标悬停时的变大效果 */
+        }
+        .select-button,
+        .clear-button {
+            background-color: red; /* 清空按钮为红色 */
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 10px 20px;
+            cursor: pointer;
+            margin-top: 10px;
+            transition: transform 0.3s ease, background-color 0.3s ease; /* 添加过渡效果 */
+        }
+        .select-button:hover,
+        .clear-button:hover {
+            background-color: black; /* 鼠标悬停时的颜色 */
+            transform: scale(1.1); /* 鼠标悬停时的变大效果 */
+        }
+        .selected {
+            background-color: #3498db; /* 将浅蓝色稍微深一点 */
+        }
+        .disabled {
+            background-color: gray; /* 不可选择的灰色背景 */
+            color: white;
+            cursor: not-allowed;
+            text-decoration: line-through; /* 划线表示不可选择 */
+        }
+        .controls {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .input-box {
+            width: 40px;
+            text-align: center;
+        }
+        .control-button {
+            background-color: #3498db;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            width: 30px;
+            height: 30px;
+            cursor: pointer;
+            margin: 0 5px;
+            font-size: 16px;
+        }
+        .control-button:disabled {
+            background-color: lightgray;
+            cursor: not-allowed;
+        }
+        .input-container {
+            display: flex;
+            align-items: center;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 5px;
+        }
+        .button-spacing {
+            flex-grow: 1; /* 自动填充剩余空间，将清空按钮推到最右侧 */
+        }
+        /* CSS 样式 */
+        .button-container {
+            display: flex;
+            justify-content: space-between; /* 左右对称布局 */
+            align-items: center;
+            margin-top: 10px; /* 将按钮向上移动10px */
+        }
+
+        .result-container {
+            display: flex;
+            align-items: center;
+            margin-top: 10px;
+        }
+        .result-title {
+            font-size: 20px; /* 与前面的标题字体大小相同 */
+            margin-right: 10px;
+        }
+        .result-output {
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            padding: 10px; /* 增加输出框的内边距 */
+            min-width: 80px; /* 增大输出框宽度 */
+        }
+        .copyright {
+            font-size: 12px; /* 设置版权信息的字体大小 */
+            color: gray; /* 设置版权信息的文字颜色为灰色 */
+            margin-top: 20px; /* 添加底部边距 */
+        }
+    </style>
+</head>
+<body>
+    <div class="main-container">
+        <!-- 输入要选取的学号个数的部分 -->
+        <h2>请输入要选取的学号个数</h2>
+        <div class="container">
+            <div class="controls">
+                <!-- 减少数量的按钮 -->
+                <button class="control-button" onclick="decreaseNumber()" id="decreaseButton" disabled>-</button>
+                <!-- 数字输入框 -->
+                <div class="input-container">
+                    <input class="input-box" type="number" id="numberInput" value="1" min="1">
+                </div>
+                <!-- 增加数量的按钮 -->
+                <button class="control-button" onclick="increaseNumber()">+</button>
+            </div>
+        </div>
+        <!-- 抽签的对话框 -->
+        <h2>请选取参与抽签的学号</h2>
+        <!-- 抽签的对话框 -->
+<div class="dialog-box">
+    <div class="container">
+        <div class="selection-box">
+            <!-- 生成48个选择框 -->
+            <!-- 将48个选择框分成5行，最后一行8个 -->
+            <!-- 每行10个选择框 -->
+            <!-- 第一行 -->
+            <button class="selection-button" onclick="toggleSelection(this)">1</button>
+            <button class="selection-button" onclick="toggleSelection(this)">2</button>
+            <button class="selection-button" onclick="toggleSelection(this)">3</button>
+            <button class="selection-button" onclick="toggleSelection(this)">4</button>
+            <button class="selection-button" onclick="toggleSelection(this)">5</button>
+            <button class="selection-button" onclick="toggleSelection(this)">6</button>
+            <button class="selection-button" onclick="toggleSelection(this)">7</button>
+            <button class="selection-button" onclick="toggleSelection(this)">8</button>
+            <button class="selection-button" onclick="toggleSelection(this)">9</button>
+            <button class="selection-button" onclick="toggleSelection(this)">10</button>
+        </div>
+        <div class="selection-box">
+            <!-- 第二行 -->
+            <button class="selection-button" onclick="toggleSelection(this)">11</button>
+            <button class="selection-button" onclick="toggleSelection(this)">12</button>
+            <button class="selection-button" onclick="toggleSelection(this)">13</button>
+            <button class="selection-button" onclick="toggleSelection(this)">14</button>
+            <button class="selection-button" onclick="toggleSelection(this)">15</button>
+            <button class="selection-button" onclick="toggleSelection(this)">16</button>
+            <button class="selection-button" onclick="toggleSelection(this)">17</button>
+            <button class="selection-button" onclick="toggleSelection(this)">18</button>
+            <button class="selection-button" onclick="toggleSelection(this)">19</button>
+            <button class="selection-button" onclick="toggleSelection(this)">20</button>
+        </div>
+        <div class="selection-box">
+            <!-- 第三行 -->
+            <button class="selection-button" onclick="toggleSelection(this)">21</button>
+            <button class="selection-button" onclick="toggleSelection(this)">22</button>
+            <button class="selection-button" onclick="toggleSelection(this)">23</button>
+            <button class="selection-button" onclick="toggleSelection(this)">24</button>
+            <button class="selection-button" onclick="toggleSelection(this)">25</button>
+            <button class="selection-button" onclick="toggleSelection(this)">26</button>
+            <button class="selection-button" onclick="toggleSelection(this)">27</button>
+            <button class="selection-button" onclick="toggleSelection(this)">28</button>
+            <button class="selection-button" onclick="toggleSelection(this)">29</button>
+            <button class="selection-button" onclick="toggleSelection(this)">30</button>
+        </div>
+        <div class="selection-box">
+            <!-- 第四行 -->
+            <button class="selection-button" onclick="toggleSelection(this)">31</button>
+            <button class="selection-button" onclick="toggleSelection(this)">32</button>
+            <button class="selection-button" onclick="toggleSelection(this)">33</button>
+            <button class="selection-button" onclick="toggleSelection(this)">34</button>
+            <button class="selection-button" onclick="toggleSelection(this)">35</button>
+            <button class="selection-button" onclick="toggleSelection(this)">36</button>
+            <button class="selection-button" onclick="toggleSelection(this)">37</button>
+            <button class="selection-button" onclick="toggleSelection(this)">38</button>
+            <button class="selection-button" onclick="toggleSelection(this)">39</button>
+            <button class="selection-button" onclick="toggleSelection(this)">40</button>
+        </div>
+        <div class="selection-box">
+            <!-- 第五行 -->
+            <button class="selection-button" onclick="toggleSelection(this)">41</button>
+            <button class="selection-button" onclick="toggleSelection(this)">42</button>
+            <button class="selection-button" onclick="toggleSelection(this)">43</button>
+            <button class="selection-button" onclick="toggleSelection(this)">44</button>
+            <button class="selection-button" onclick="toggleSelection(this)">45</button>
+            <button class="selection-button" onclick="toggleSelection(this)">46</button>
+            <button class="selection-button" onclick="toggleSelection(this)">47</button>
+            <button class="selection-button" onclick="toggleSelection(this)">48</button>
+        </div>
+    </div>
+</div>
+
+        <!-- 选取、全选和清空按钮 -->
+        <div class="button-container">
+            <!-- 选取按钮 -->
+            <!-- 选取按钮 -->
+            <button class="select-button" onclick="selectNumbers()" style="background-color: green;">选取</button>
+
+            <!-- 全选按钮 -->
+            <button class="select-button" onclick="selectAll()"style="background-color: blue;">全选</button>
+            <!-- 清空按钮 -->
+            <button class="clear-button" onclick="clearSelection()"style="background-color: red;">清空</button>
+        </div>
+
+        <!-- 被选中的学号 -->
+        <div class="result-container">
+            <h2 class="result-title">被选中的学号：</h2>
+            <div class="result-output" id="resultOutput"></div>
+        </div>
+    </div>
+    <!-- 版权信息 -->
+    <div class="copyright">
+        Author: 西南位育2025届 邱艺鹏<br>
+        Contact: michael_q1p@163.com 13524857896<br>
+        Copyright (C) 2024 邱艺鹏
+    </div>
+    <script>
+        document.addEventListener('contextmenu', event => event.preventDefault());
+
+        // JavaScript 代码
+        function toggleSelection(button) {
+            if (!button.classList.contains('disabled')) {
+                button.classList.toggle('selected');
+            }
+        }
+
+        function clearSelection() {
+            const buttons = document.querySelectorAll('.selection-button');
+            buttons.forEach(button => {
+                if (!button.classList.contains('disabled')) {
+                    button.classList.remove('selected');
+                }
+            });
+            // 清空结果输出
+            document.getElementById('resultOutput').textContent = '';
+        }
+
+        function increaseNumber() {
+            const inputBox = document.getElementById('numberInput');
+            const decreaseButton = document.getElementById('decreaseButton');
+            const currentValue = parseInt(inputBox.value);
+            if (currentValue >= 1) {
+                inputBox.value = currentValue + 1;
+                if (currentValue === 1) {
+                    decreaseButton.disabled = false;
+                }
+            }
+        }
+
+        function decreaseNumber() {
+            const inputBox = document.getElementById('numberInput');
+            const decreaseButton = document.getElementById('decreaseButton');
+            const currentValue = parseInt(inputBox.value);
+            if (currentValue > 1) {
+                inputBox.value = currentValue - 1;
+            }
+            if (currentValue === 2) {
+                decreaseButton.disabled = true;
+            }
+        }
+
+        function selectNumbers() {
+            const numberInput = document.getElementById('numberInput');
+            const selectedButtons = document.querySelectorAll('.selection-button.selected');
+            const resultOutput = document.getElementById('resultOutput');
+            const selectedNumbers = [];
+
+            if (selectedButtons.length > 0) {
+                // 获取选中的数字
+                selectedButtons.forEach(button => {
+                    selectedNumbers.push(parseInt(button.textContent));
+                });
+
+                // 获取要选取的数量
+                const numToSelect = parseInt(numberInput.value);
+                if (numToSelect > 0 && numToSelect <= selectedNumbers.length) {
+                    // 随机选取数字
+                    const randomNumbers = [];
+                    while (randomNumbers.length < numToSelect) {
+                        const randomIndex = Math.floor(Math.random() * selectedNumbers.length);
+                        const randomNumber = selectedNumbers.splice(randomIndex, 1)[0];
+                        randomNumbers.push(randomNumber);
+                    }
+
+                    // 排序并显示在结果输出框中
+                    randomNumbers.sort((a, b) => a - b);
+                    resultOutput.textContent = randomNumbers.join(', ');
+                }
+            }
+        }
+
+        // 新增全选功能
+        function selectAll() {
+            const selectionButtons = document.querySelectorAll('.selection-button:not(.disabled)');
+            selectionButtons.forEach(button => {
+                const number = parseInt(button.textContent);
+                button.classList.add('selected');
+
+            });
+        }
+    </script>
+</body>
+</html>
