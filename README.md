@@ -16,6 +16,7 @@
 - HTML
 - CSS
 - JavaScript
+- 《HTML 100%》
 
 ## 安装指南
 
