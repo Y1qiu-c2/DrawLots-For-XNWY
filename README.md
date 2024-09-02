@@ -49,7 +49,7 @@
 
 ## 联系方式
 
-- 负责人: 上海西南位育中学初二六班电教员 邱艺鹏
+- 负责人: 上海西南位育中学初三七班电教员 邱艺鹏
 - 邮件: michael_q1p@163.com
 - 微信：XNWYRobotics2023
 - GitHub: [Intrenovation](https://github.com/Intrenovation)
