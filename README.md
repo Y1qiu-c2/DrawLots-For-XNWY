@@ -52,7 +52,7 @@
 - 负责人: 上海西南位育中学初三七班电教员 邱艺鹏
 - 邮件: michael_q1p@163.com
 - 微信：NatusV1nceree
-- GitHub: [Intrenovation](https://github.com/Intrenovation)
+- GitHub: [Qiu Yipeng]([https://github.com/Intrenovation](https://github.com/Y1qiu-c2))
 
 ---
 
